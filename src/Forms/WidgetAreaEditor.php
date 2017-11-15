@@ -11,6 +11,7 @@ use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\Widgets\Forms\WidgetAreaEditor;
 use SilverStripe\Widgets\Model\Widget;
+use SilverStripe\View\Requirements;
 
 /**
  * Special field type for selecting and configuring widgets on a page.
@@ -41,7 +42,6 @@ class WidgetAreaEditor extends FormField
     {
         Requirements::css('silverstripe/widgets:css/WidgetAreaEditor.css');
         Requirements::javascript('silverstripe/widgets:javascript/WidgetAreaEditor.js');
-
         return $this->renderWith(WidgetAreaEditor::class);
     }
 
@@ -167,10 +167,10 @@ class WidgetAreaEditor extends FormField
                 // create a new object
                 if (!$widget
                     && !empty($newWidgetData['Type'])
-                    && class_exists($newWidgetData['Type'])
-                    && is_subclass_of($newWidgetData['Type'], Widget::class)
+                    && class_exists( '\\'.str_replace("_","\\",$newWidgetData['Type']) )
+                    && is_subclass_of( '\\'.str_replace("_","\\",$newWidgetData['Type']) , Widget::class)
                 ) {
-                    $widget = Injector::inst()->create($newWidgetData['Type']);
+                    $widget = Injector::inst()->create('\\'.str_replace("_","\\",$newWidgetData['Type']));
                     $widget->ID = 0;
                     $widget->ParentID = $record->$name()->ID;
                 }
